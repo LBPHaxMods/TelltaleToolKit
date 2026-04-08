@@ -97,6 +97,12 @@ public class PropertySet
                         continue;
                     }
 
+                    //add color version info
+                    if (typeSymbol.Symbol.Crc64 == 13936216386901467819UL)
+                    {
+                        streamWriter.AddVersionInfo(streamWriter.GetMetaClass(typeSymbol.Symbol));
+                    }
+
                     if (!groups.TryGetValue(typeSymbol, out List<KeyValuePair<Symbol, PropertyEntry>>? list))
                     {
                         list = new List<KeyValuePair<Symbol, PropertyEntry>>();
