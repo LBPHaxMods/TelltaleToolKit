@@ -97,11 +97,6 @@ public class T3MeshData
         private static readonly DefaultClassSerializer<T3MeshData> DefaultSerializer = new();
 
 
-        private static bool IsIdentityTexCoordTransform(T3MeshTexCoordTransform? transform)
-        {
-            return transform == null; 
-        }
-
         public override void Serialize(ref T3MeshData obj, MetaStream stream)
         {
             DefaultSerializer.PreSerialize(ref obj, stream);
@@ -114,40 +109,37 @@ public class T3MeshData
 
                 uint uvTransformCount = 0;
                 //referenced from lucas saragosa's serialization code
-                for (int i = 0; i < obj.TexCoordTransform.Length; i++)
+                for (int i = 0; i < Math.Min(obj.TexCoordTransform.Length, 4); i++)
                 {
-                    if (!IsIdentityTexCoordTransform(obj.TexCoordTransform[i]))
+                    T3MeshTexCoordTransform transform = obj.TexCoordTransform[i];
+                    if (transform != null &&
+                        (transform.Scale != Vector2.One || transform.Offset != Vector2.Zero))
                     {
                         uvTransformCount++;
-
                     }
                 }
 
                 streamWriter.Write(uvTransformCount);
 
-                for (int i = 0; i < obj.TexCoordTransform.Length; i++)
+                for (int i = 0; i < Math.Min(obj.TexCoordTransform.Length, 4); i++)
                 {
                     T3MeshTexCoordTransform transform = obj.TexCoordTransform[i];
-                    if (IsIdentityTexCoordTransform(transform))
-                        continue;
 
-                    streamWriter.Write(i);
+                    if (transform == null ||
+                        (transform.Scale == Vector2.One && transform.Offset == Vector2.Zero))
+                    {
+                        continue;
+                    }
+
+                    streamWriter.Write((uint)i);
                     stream.PreSerialize(ref transform);
                     stream.Serialize(ref transform);
                     obj.TexCoordTransform[i] = transform;
                 }
 
-                // ttk uses system.numerics for vectors, so add Vector2 version info manually, some meshes need this in order to work.
-                streamWriter.AddVersionInfo(streamWriter.GetMetaClass(new Symbol(8916179779089013255)));
                 bool hasCpuSkinning = (obj.Flags.Data & (int)MeshFlags.eHasCPUSkinning) != 0;
                 if (hasCpuSkinning)
                 {
-                    if (obj.CPUSkinningData == null)
-                    {
-                        throw new InvalidOperationException(
-                            "CPUSkinningData is null.");
-                    }
-
                     T3MeshCPUSkinningData cpuSkinning = obj.CPUSkinningData;
                     stream.PreSerialize(ref cpuSkinning);
                     stream.Serialize(ref cpuSkinning);
