@@ -352,7 +352,6 @@ public class D3DMesh
 
         public override void Serialize(ref D3DMesh obj, MetaStream stream)
         {
-
             DefaultSerializer.PreSerialize(ref obj, stream);
             DefaultSerializer.Serialize(ref obj, stream);
 
@@ -365,14 +364,12 @@ public class D3DMesh
                 }
 
 
-
                 if (obj.Version >= 22)
                 {
                     SerializeInternalResources(ref obj, stream);
                 }
 
                 streamWriter.Write(0);
-
 
 
                 if (obj.Version >= 52)
@@ -638,7 +635,7 @@ public class D3DMesh
                 }
             }
         }
-         
+
         private static void SerializeInternalResources(ref D3DMesh obj, MetaStream stream)
         {
             if (stream is MetaStreamWriter streamWriter)
@@ -666,14 +663,11 @@ public class D3DMesh
                     stream.BeginBlock();
 
 
-
-
                     MetaClassSerializer serializer = Toolkit.Instance.GetSerializer(typeSymbol.LinkingType);
                     serializer.PreSerialize(ref propertyValue, stream, typeSymbol);
 
 
                     serializer.Serialize(ref propertyValue, stream);
-
 
 
                     stream.EndBlock();
@@ -713,7 +707,7 @@ public class D3DMesh
                             HandleObject = propertyValue
                         }
                     };
-                    
+
                     obj.InternalResources.Add(objHandle);
 
                     stream.EndBlock();
@@ -884,7 +878,6 @@ public class D3DMesh
 
         return prop as Handle<T3Texture>;
     }
-
 
     public Handle<T3Texture>? GetDiffuseTexture(int index)
     {

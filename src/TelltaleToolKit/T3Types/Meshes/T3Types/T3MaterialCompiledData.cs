@@ -154,4 +154,4 @@ public enum T3MaterialQualityType
 	High = 0,
 	Low = 1,
 	Lowest = 2
-};
+}

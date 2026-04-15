@@ -28,14 +28,14 @@ public struct Color
     {
         public override void Serialize(ref Color obj, MetaStream stream)
         {
-
             if (stream is MetaStreamWriter streamWriter)
             {
-                if(streamWriter.Configuration.CanModifySerializedClassesList)
+                if (streamWriter.Configuration.CanModifySerializedClassesList)
                 {
                     MetaClass? description = stream.GetMetaClass(typeof(Color));
                     streamWriter.AddVersionInfo(description);
                 }
+
                 streamWriter.Write(obj.R);
                 streamWriter.Write(obj.G);
                 streamWriter.Write(obj.B);

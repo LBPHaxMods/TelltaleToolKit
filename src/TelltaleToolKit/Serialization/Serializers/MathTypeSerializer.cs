@@ -17,6 +17,7 @@ public class Vector2Serializer : MetaClassSerializer<Vector2>
                 MetaClass? description = stream.GetMetaClass(typeof(Vector2));
                 streamWriter.AddVersionInfo(description);
             }
+
             streamWriter.Write(obj.X);
             streamWriter.Write(obj.Y);
         }
@@ -40,6 +41,7 @@ public class Vector3Serializer : MetaClassSerializer<Vector3>
                 MetaClass? description = stream.GetMetaClass(typeof(Vector3));
                 streamWriter.AddVersionInfo(description);
             }
+
             streamWriter.Write(obj.X);
             streamWriter.Write(obj.Y);
             streamWriter.Write(obj.Z);
@@ -65,6 +67,7 @@ public class Vector4Serializer : MetaClassSerializer<Vector4>
                 MetaClass? description = stream.GetMetaClass(typeof(Vector4));
                 streamWriter.AddVersionInfo(description);
             }
+
             streamWriter.Write(obj.X);
             streamWriter.Write(obj.Y);
             streamWriter.Write(obj.Z);
@@ -80,7 +83,6 @@ public class Vector4Serializer : MetaClassSerializer<Vector4>
     }
 }
 
-
 [MetaClassSerializerGlobal(typeof(QuaternionSerializer))]
 public class QuaternionSerializer : MetaClassSerializer<Quaternion>
 {
@@ -93,6 +95,7 @@ public class QuaternionSerializer : MetaClassSerializer<Quaternion>
                 MetaClass? description = stream.GetMetaClass(typeof(Quaternion));
                 streamWriter.AddVersionInfo(description);
             }
+
             streamWriter.Write(obj.X);
             streamWriter.Write(obj.Y);
             streamWriter.Write(obj.Z);

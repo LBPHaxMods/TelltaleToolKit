@@ -17,7 +17,7 @@ public class T3MaterialData
 
     [MetaMember("mLegacyRenderTextureProperty")]
     public Symbol LegacyBlendModeTextureProperty { get; set; }
-    
+
     [MetaMember("mLegacyBlendModeRuntimeProperty")]
     public Symbol LegacyBlendModeRuntimeProperty { get; set; }
 
@@ -57,7 +57,6 @@ public class T3MaterialData
 
         public override void Serialize(ref T3MaterialData obj, MetaStream stream)
         {
-
             DefaultSerializer.Serialize(ref obj, stream);
 
             MetaClass? classDescription = stream.GetMetaClass(typeof(T3MaterialData));
@@ -71,7 +70,7 @@ public class T3MaterialData
 
                 streamWriter.Write(obj.CompiledData2.Count);
 
-                for (int i = 0; i < obj.CompiledData2.Count; i++)
+                for (var i = 0; i < obj.CompiledData2.Count; i++)
                 {
                     streamWriter.Write(i);
 
@@ -92,11 +91,11 @@ public class T3MaterialData
                 int numCompiledData = streamReader.ReadInt32();
 
                 obj.CompiledData2 = new List<T3MaterialCompiledData>(numCompiledData);
-                
-                for (int i = 0; i < numCompiledData; i++)
+
+                for (var i = 0; i < numCompiledData; i++)
                     obj.CompiledData2.Add(new T3MaterialCompiledData());
 
-                for (int i = 0; i < numCompiledData; i++)
+                for (var i = 0; i < numCompiledData; i++)
                 {
                     int materialIndex = streamReader.ReadInt32();
 

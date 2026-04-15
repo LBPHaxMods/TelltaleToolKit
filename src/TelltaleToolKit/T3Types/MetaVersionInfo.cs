@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TelltaleToolKit.Reflection;
+﻿using TelltaleToolKit.Reflection;
 using TelltaleToolKit.Serialization;
 using TelltaleToolKit.Serialization.Serializers;
 
@@ -16,4 +13,3 @@ public class MetaVersionInfo
     [MetaMember("mVersionCrc")]
     public uint mVersionCrc;
 }
-

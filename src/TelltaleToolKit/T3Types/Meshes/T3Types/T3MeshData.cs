@@ -104,16 +104,12 @@ public class T3MeshData
 
             if (stream is MetaStreamWriter streamWriter)
             {
-                obj.VertexStates ??= [];
-                obj.TexCoordTransform ??= new T3MeshTexCoordTransform[4];
-
                 uint uvTransformCount = 0;
-                //referenced from lucas saragosa's serialization code
-                for (int i = 0; i < Math.Min(obj.TexCoordTransform.Length, 4); i++)
+                // Referenced from Lucas Saragosa's serialization code
+                for (var i = 0; i < Math.Min(obj.TexCoordTransform.Length, 4); i++)
                 {
                     T3MeshTexCoordTransform transform = obj.TexCoordTransform[i];
-                    if (transform != null &&
-                        (transform.Scale != Vector2.One || transform.Offset != Vector2.Zero))
+                    if (transform.Scale != Vector2.One || transform.Offset != Vector2.Zero)
                     {
                         uvTransformCount++;
                     }
@@ -121,12 +117,11 @@ public class T3MeshData
 
                 streamWriter.Write(uvTransformCount);
 
-                for (int i = 0; i < Math.Min(obj.TexCoordTransform.Length, 4); i++)
+                for (var i = 0; i < Math.Min(obj.TexCoordTransform.Length, 4); i++)
                 {
                     T3MeshTexCoordTransform transform = obj.TexCoordTransform[i];
 
-                    if (transform == null ||
-                        (transform.Scale == Vector2.One && transform.Offset == Vector2.Zero))
+                    if (transform.Scale == Vector2.One && transform.Offset == Vector2.Zero)
                     {
                         continue;
                     }
@@ -148,7 +143,7 @@ public class T3MeshData
 
                 streamWriter.Write(obj.VertexStates.Count);
 
-                for (int i = 0; i < obj.VertexStates.Count; i++)
+                for (var i = 0; i < obj.VertexStates.Count; i++)
                 {
                     T3GFXVertexState state = obj.VertexStates[i];
                     stream.PreSerialize(ref state);

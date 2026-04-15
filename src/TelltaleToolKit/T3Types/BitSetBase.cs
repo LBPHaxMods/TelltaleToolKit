@@ -37,10 +37,9 @@ public class BitSetBase
                 _ => throw new InvalidDataException($"Unexpected BitSetBase type: {type.Symbol.SymbolName}")
             };
 
-            if (obj == null || obj.Values == null || obj.Values.Length != bitSetSize.Value)
+            if (obj?.Values == null || obj.Values.Length != bitSetSize.Value)
             {
                 obj = new BitSetBase(bitSetSize.Value);
-                return;
             }
         }
 

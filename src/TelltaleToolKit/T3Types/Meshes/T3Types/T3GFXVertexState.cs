@@ -51,7 +51,7 @@ public class T3GFXVertexState
                 if (desc is not null && desc.ContainsMember("mIndexBufferCount") && obj.IndexBufferCount > 4)
                     throw new InvalidDataException("IndexBufferCount is too large");
 
-                for (int i = 0; i < obj.Attributes.Count; i++)
+                for (var i = 0; i < obj.Attributes.Count; i++)
                 {
                     GFXPlatformAttributeParams attribute = obj.Attributes[i];
                     stream.PreSerialize(ref attribute);
@@ -61,7 +61,7 @@ public class T3GFXVertexState
 
                 if (desc is not null && desc.ContainsMember("mIndexBufferCount"))
                 {
-                    for (int i = 0; i < obj.IndexBuffer.Count; i++)
+                    for (var i = 0; i < obj.IndexBuffer.Count; i++)
                     {
                         T3GFXBuffer indexBuffer = obj.IndexBuffer[i];
                         stream.PreSerialize(ref indexBuffer);
@@ -83,7 +83,7 @@ public class T3GFXVertexState
                     }
                 }
 
-                for (int i = 0; i < obj.VertexBuffer.Count; i++)
+                for (var i = 0; i < obj.VertexBuffer.Count; i++)
                 {
                     T3GFXBuffer vertexBuffer = obj.VertexBuffer[i];
                     stream.PreSerialize(ref vertexBuffer);
@@ -98,7 +98,7 @@ public class T3GFXVertexState
                     throw new InvalidDataException("AttributeCount is too large");
 
                 //if (obj.VertexCountPerInstance > 32)
-                    //throw new InvalidDataException("VertexCountPerInstance is too large"); // Remove this for modding
+                //throw new InvalidDataException("VertexCountPerInstance is too large"); // Remove this for modding
 
                 if (obj.IndexBufferCount > 4)
                     throw new InvalidDataException("IndexBufferCount is too large");
