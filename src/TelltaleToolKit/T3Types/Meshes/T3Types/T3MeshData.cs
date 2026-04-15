@@ -90,7 +90,7 @@ public class T3MeshData
 
     public List<T3GFXVertexState> VertexStates { get; set; } = [];
     public T3MeshCPUSkinningData CPUSkinningData { get; set; }
-    public T3MeshTexCoordTransform[] TexCoordTransform { get; set; } = new T3MeshTexCoordTransform[4];
+    public T3MeshTexCoordTransform[] TexCoordTransform { get; set; } = [new(), new(), new(), new()];
 
     public class Serializer : MetaClassSerializer<T3MeshData>
     {
