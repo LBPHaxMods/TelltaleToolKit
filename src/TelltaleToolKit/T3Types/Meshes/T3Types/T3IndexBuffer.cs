@@ -41,6 +41,7 @@ public class T3IndexBuffer
 
             if (stream.Mode is MetaStreamMode.Write)
             {
+                stream.Write(obj.Buffer);
             }
             else if (stream.Mode is MetaStreamMode.Read)
             {

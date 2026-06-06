@@ -104,7 +104,7 @@ public class D3DMesh
     public int AnimatedVertexCount { get; set; }
 
     [MetaMember("mTextures")]
-    public List<Texture>[] Textures { get; set; } = new List<Texture>[11];
+    public List<Texture>[] Textures { get; set; } = new List<Texture>[14];
 
     [MetaMember("mDiffuseScale")]
     public Vector2 DiffuseScale { get; set; }
@@ -211,10 +211,10 @@ public class D3DMesh
         public bool HasPixelShaderRemoveMe { get; set; }
 
         [MetaMember("mTxIndex")]
-        public int[] TxIndex { get; set; } = new int[11];
+        public int[] TxIndex { get; set; } = new int[14];
 
         [MetaMember("mTriStrips")]
-        public List<int> TriStrips { get; set; } = [];
+        public List<ushort> TriStrips { get; set; } = [];
 
         [MetaMember("mNumTotalIndices")]
         public int NumTotalIndices { get; set; }
@@ -239,6 +239,9 @@ public class D3DMesh
 
         [MetaMember("mSpecularColor")]
         public Color SpecularColor { get; set; }
+
+        [MetaMember("mSpecularPower")]
+        public float SpecularPower { get; set; }
 
         [MetaMember("mDiffuseColor")]
         public Color DiffuseColor { get; set; }
@@ -356,9 +359,16 @@ public class D3DMesh
 
             if (stream.Mode is MetaStreamMode.Write)
             {
-                if (obj.Version < 19)
+                // According to Telltale, the new meshes start from version 20.
+                if (obj.Version == 0)
                 {
                     SerializeOldD3DMesh(ref obj, stream);
+                    return;
+                }
+
+                if (obj.Version > 0 && obj.Version < 19)
+                {
+                    SerializeOldMedD3DMesh(ref obj, stream);
                     return;
                 }
 
@@ -447,148 +457,69 @@ public class D3DMesh
 
         private static void SerializeOldMedD3DMesh(ref D3DMesh obj, MetaStream stream)
         {
-            if (stream.Mode is MetaStreamMode.Write)
-            {
-                throw new NotSupportedException();
-            }
-
             if (stream.Mode is MetaStreamMode.Read)
             {
-                obj.T3VertexBuffers = new T3VertexBuffer[15];
+                obj.T3VertexBuffers = new T3VertexBuffer[16];
+            }
 
-                if (obj.Flags.Has((int)MeshFlags.HasIndexBuffer))
+            if (obj.Flags.Has((int)MeshFlags.HasIndexBuffer))
+            {
+                if (stream.Mode is MetaStreamMode.Read)
                 {
                     var buffer = new T3IndexBuffer();
                     Toolkit.Instance.GetSerializer<T3IndexBuffer>().Serialize(ref buffer, stream);
                     obj.T3IndexBuffer = buffer;
                 }
-
-                if (obj.Flags.Has((int)MeshFlags.HasPosStream))
+                else
                 {
-                    var buffer = new T3VertexBuffer();
-                    Toolkit.Instance.GetSerializer<T3VertexBuffer>().Serialize(ref buffer, stream);
-                    obj.T3VertexBuffers[0] = buffer;
+                    var buffer = obj.T3IndexBuffer ?? throw new InvalidOperationException(
+                        "HasIndexBuffer flag is set but T3IndexBuffer is null.");
+                    Toolkit.Instance.GetSerializer<T3IndexBuffer>().Serialize(ref buffer, stream);
                 }
+            }
 
-                if (obj.Flags.Has((int)MeshFlags.HasNormStream))
-                {
-                    var buffer = new T3VertexBuffer();
-                    Toolkit.Instance.GetSerializer<T3VertexBuffer>().Serialize(ref buffer, stream);
-                    obj.T3VertexBuffers[1] = buffer;
-                }
+            (MeshFlags Flag, int Slot)[] vertexBuffers =
+            [
+                (MeshFlags.HasPosStream, 0),
+                (MeshFlags.HasNormStream, 1),
+                (MeshFlags.HasBlendWeightStream, 2),
+                (MeshFlags.HasBlendIdxStream, 3),
+                (MeshFlags.HasUV1Stream, 4),
+                (MeshFlags.HasUV2Stream, 5),
+                (MeshFlags.HasUV3Stream, 6),
+                (MeshFlags.HasUV4Stream, 7),
+                (MeshFlags.HasTangentStream, 8),
+                (MeshFlags.HasColorStream, 9),
+                (MeshFlags.HasSmoothNormStream, 10),
+                (MeshFlags.Unknown, 11),
+                (MeshFlags.Unknown2, 12),
+                (MeshFlags.HasInterleavedStream, 13),
+                (MeshFlags.HasUVBuffer, 14),
+                (MeshFlags.HasSoftwareSkinningStream, 15),
+            ];
 
-                if (obj.Flags.Has((int)MeshFlags.HasSmoothNormStream))
-                {
-                    var buffer = new T3VertexBuffer();
-                    Toolkit.Instance.GetSerializer<T3VertexBuffer>().Serialize(ref buffer, stream);
-                    obj.T3VertexBuffers[2] = buffer;
-                }
+            foreach ((MeshFlags flag, int slot) in vertexBuffers)
+            {
+                SerializeVertexBuffer(ref obj, stream, flag, slot);
+            }
+        }
 
-                if (obj.Flags.Has((int)MeshFlags.HasBlendWeightStream))
-                {
-                    var buffer = new T3VertexBuffer();
-                    Toolkit.Instance.GetSerializer<T3VertexBuffer>().Serialize(ref buffer, stream);
-                    obj.T3VertexBuffers[3] = buffer;
-                }
+        private static void SerializeVertexBuffer(ref D3DMesh obj, MetaStream stream, MeshFlags flag, int slot)
+        {
+            if (!obj.Flags.Has((int)flag))
+                return;
 
-                if (obj.Flags.Has((int)MeshFlags.HasBlendIdxStream))
-                {
-                    var buffer = new T3VertexBuffer();
-                    Toolkit.Instance.GetSerializer<T3VertexBuffer>().Serialize(ref buffer, stream);
-                    obj.T3VertexBuffers[4] = buffer;
-                }
-
-                if (obj.Flags.Has((int)MeshFlags.HasUV1Stream))
-                {
-                    var buffer = new T3VertexBuffer();
-                    Toolkit.Instance.GetSerializer<T3VertexBuffer>().Serialize(ref buffer, stream);
-                    obj.T3VertexBuffers[5] = buffer;
-                }
-
-                if (obj.Flags.Has((int)MeshFlags.HasUV2Stream))
-                {
-                    var buffer = new T3VertexBuffer();
-                    Toolkit.Instance.GetSerializer<T3VertexBuffer>().Serialize(ref buffer, stream);
-                    obj.T3VertexBuffers[6] = buffer;
-                }
-
-                if (obj.Flags.Has((int)MeshFlags.HasUV3Stream))
-                {
-                    var buffer = new T3VertexBuffer();
-                    Toolkit.Instance.GetSerializer<T3VertexBuffer>().Serialize(ref buffer, stream);
-                    obj.T3VertexBuffers[7] = buffer;
-                }
-
-                if (obj.Flags.Has((int)MeshFlags.HasUV4Stream))
-                {
-                    var buffer = new T3VertexBuffer();
-                    Toolkit.Instance.GetSerializer<T3VertexBuffer>().Serialize(ref buffer, stream);
-                    obj.T3VertexBuffers[8] = buffer;
-                }
-
-                if (obj.Flags.Has((int)MeshFlags.HasTangentStream))
-                {
-                    var buffer = new T3VertexBuffer();
-                    Toolkit.Instance.GetSerializer<T3VertexBuffer>().Serialize(ref buffer, stream);
-                    obj.T3VertexBuffers[9] = buffer;
-                }
-
-                if (obj.Flags.Has((int)MeshFlags.HasColorStream))
-                {
-                    var buffer = new T3VertexBuffer();
-                    Toolkit.Instance.GetSerializer<T3VertexBuffer>().Serialize(ref buffer, stream);
-                    obj.T3VertexBuffers[10] = buffer;
-                }
-
-                if (obj.Flags.Has((int)MeshFlags.Unknown))
-                {
-                    var buffer = new T3VertexBuffer();
-                    Toolkit.Instance.GetSerializer<T3VertexBuffer>().Serialize(ref buffer, stream);
-                    obj.T3VertexBuffers[11] = buffer;
-                }
-
-                if (obj.Flags.Has((int)MeshFlags.HasInterleavedStream))
-                {
-                    var buffer = new T3VertexBuffer();
-                    Toolkit.Instance.GetSerializer<T3VertexBuffer>().Serialize(ref buffer, stream);
-                    obj.T3VertexBuffers[12] = buffer;
-                }
-
-                if (obj.Flags.Has((int)MeshFlags.HasSoftwareSkinningStream))
-                {
-                    var buffer = new T3VertexBuffer();
-                    Toolkit.Instance.GetSerializer<T3VertexBuffer>().Serialize(ref buffer, stream);
-                    obj.T3VertexBuffers[13] = buffer;
-                }
-                // Read Index Buffer
-                // bool hasIndexBuffer = stream.ReadBoolean();
-                //
-                // if (hasIndexBuffer)
-                // {
-
-                // }
-                //
-                // // Read Vertex Buffer
-                // var maxVertexBufferCount = 9;
-                // if (obj.VertexAlphaSupport)
-                // {
-                //     maxVertexBufferCount++;
-                // }
-                //
-                // obj.T3VertexBuffers = new T3VertexBuffer[maxVertexBufferCount];
-                //
-                // for (int i = 0; i < obj.T3VertexBuffers.Length; i++)
-                // {
-                //     bool hasVertexBuffer = stream.ReadBoolean();
-                //
-                //     if (!hasVertexBuffer)
-                //         continue;
-                //
-                //     var buffer = new T3VertexBuffer();
-                //     TTKGlobalContext.Instance().GetSerializer<T3VertexBuffer>().Serialize(ref buffer, stream);
-                //
-                //     obj.T3VertexBuffers[i] = buffer;
-                // }
+            if (stream.Mode is MetaStreamMode.Read)
+            {
+                var buffer = new T3VertexBuffer();
+                Toolkit.Instance.GetSerializer<T3VertexBuffer>().Serialize(ref buffer, stream);
+                obj.T3VertexBuffers[slot] = buffer;
+            }
+            else
+            {
+                var buffer = obj.T3VertexBuffers[slot] ?? throw new InvalidOperationException(
+                    $"Flag {flag} is set but T3VertexBuffers[{slot}] is null.");
+                Toolkit.Instance.GetSerializer<T3VertexBuffer>().Serialize(ref buffer, stream);
             }
         }
 
@@ -738,11 +669,13 @@ public class D3DMesh
         HasTangentStream = 0x400,
         HasColorStream = 0x800,
         Unknown = 0x1000,
+        Unknown2 = 0x2000,
         HasVertexAnimation = 0x10000,
         TriangleSetsFixedUp = 0x40000,
         HasZeroVertexAlpha = 0x80000,
         HasInterleavedStream = 0x200000,
         HasSoftwareSkinningStream = 0x400000,
+        HasUVBuffer = 0x2000000,
         IsManualSort = 0x10000000, // Vector 3???!?!?
         Deformable = 0x20000000, // It's a string - Interface
     }

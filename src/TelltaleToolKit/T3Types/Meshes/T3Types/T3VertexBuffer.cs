@@ -32,7 +32,7 @@ public class T3VertexBuffer
     public int Usage { get; set; }
 
     [MetaMember("mVertexComponents")]
-    public T3VertexComponent[] VertexComponents { get; set; } = new T3VertexComponent[12];
+    public T3VertexComponent[] VertexComponents { get; set; } = new T3VertexComponent[13];
 
     [MetaMember("mbStoreCompressed")]
     public bool StoreCompressed { get; set; }
@@ -50,7 +50,7 @@ public class T3VertexBuffer
 
             if (stream.Mode is MetaStreamMode.Write)
             {
-                throw new NotImplementedException($"There is no serializer for {SerializationType}");
+                stream.Write(obj.Buffer);
             }
 
             if (stream.Mode is MetaStreamMode.Read)
